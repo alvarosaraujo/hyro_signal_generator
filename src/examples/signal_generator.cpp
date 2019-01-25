@@ -218,7 +218,6 @@ int main()
     dynamic_property_access_signal.set<double>("amplitude", signal_amp);
     dynamic_property_access_signal.set<double>("frequency", freq);
     dynamic_property_access_signal.set<bool>("cosine", sin_or_cos);
-
     dynamic_property_access_digital.set<double>("amplitude", digital_amp);
     dynamic_property_access_digital.set<double>("threshold", thrhold);
   }
