@@ -7,21 +7,20 @@ using namespace std::chrono_literals;
 
 namespace hyro
 {
-hyro::Signal message_signal_rec;
-hyro::Signal message_output;
+
+// Where should I declare those variables to be accessible to all functions?
+
+// How to initialize parameters with config.parameters.getParameter?
+
+// Use 'check' with both testing and main code
+
 Thresholding thold;
 std::shared_ptr<HyroLogger> DigitalConverterComponent::s_logger = HyroLoggerManager::CreateLogger("DigitalConverterComponent");
 
 Result
 DigitalConverterComponent::init (const ComponentConfiguration & configuration)
 {
-  /**
-   * @brief Initializes DigitalConverterComponent
-   * 
-   */
-
-  std::shared_ptr<ChannelOutput<std::vector<int>>>
-  m_dummy = this->registerOutput<std::vector<int>>("fix_dynamic"_uri, configuration);
+  auto m_dummy = registerOutput<std::vector<int>>("fix_dynamic"_uri, configuration);
 
   m_input = this->registerInput<Signal>("value"_uri, configuration);
   m_output = this->registerOutput<double>("digital"_uri, configuration);
@@ -46,8 +45,7 @@ DigitalConverterComponent::init (const ComponentConfiguration & configuration)
 bool 
 DigitalConverterComponent::setThreshold(double th) 
 { 
-  threshold = th; 
-  thold.setThreshold(threshold);
+  thold.setThreshold(th);
   return true;
 }
 
@@ -55,15 +53,14 @@ DigitalConverterComponent::setThreshold(double th)
 double 
 DigitalConverterComponent::getThreshold() 
 { 
-  return threshold; 
+  return thold.getThreshold();
 }
 
 // Set amplitude dynamic property
 bool 
 DigitalConverterComponent::setAmplitude(double amp) 
 {
-  amplitude = amp;
-  thold.setAmplitude(amplitude);
+  thold.setAmplitude(amp);
   return true; 
 }
 
@@ -71,12 +68,14 @@ DigitalConverterComponent::setAmplitude(double amp)
 double 
 DigitalConverterComponent::getAmplitude() 
 { 
-  return amplitude; 
+  return thold.getAmplitude();
 }
 
 Result
 DigitalConverterComponent::check ()
 { 
+  if (m_input->connectionStatus() != ConnectionStatus::CONNECTION_UP)
+    return Result::RESULT_ERROR;
   return Result::RESULT_OK;
 }
 
@@ -104,12 +103,12 @@ void
 DigitalConverterComponent::callback (std::shared_ptr<const Signal> && value)
 {
   //Retrieves data from received message
-  std::string timestamp = value->timestamp;
-  std::string frame = value->frame_id;
+  //long int timestamp = value->timestamp;
+  //std::string frame = value->frame_id;
   double val = value->value;
 
   //Calculates digital output from received value
-  double res = thold.get_threshold(val);
+  double res = thold.calculateThreshold(val);
 
   //Send result
   m_output->sendAsync(res);

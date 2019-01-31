@@ -11,7 +11,7 @@ namespace hyro
 
 struct HYRO_SIGNAL_GENERATOR_COMPONENTS_EXPORT Signal
 {
-  std::string timestamp;
+  long int timestamp;
   std::string frame_id;
   double value;
 };

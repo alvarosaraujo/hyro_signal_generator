@@ -62,7 +62,7 @@ public:
 
 private:
 
-  double amplitude, threshold;
+  double m_amplitude, m_threshold;
 
   static std::shared_ptr<HyroLogger> s_logger;
   std::shared_ptr<hyro::ChannelInput<Signal>> m_input;

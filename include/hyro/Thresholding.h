@@ -12,12 +12,12 @@ class Thresholding
 {
   private:
 
-    double amplitude, threshold;
+    double m_amplitude, m_threshold;
 
   public:
 
     Thresholding();
-    double get_threshold(double value);
+    double calculateThreshold(double value);
     double getThreshold();
     void setThreshold(double th);
     void setAmplitude(double amp);

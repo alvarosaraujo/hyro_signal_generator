@@ -6,6 +6,6 @@ message Signal
 {
     double value        = 1;
     string frame_id     = 2;
-    string timestamp    = 3;
+    int64 timestamp    = 3;
     double amplitude    = 4;
 }

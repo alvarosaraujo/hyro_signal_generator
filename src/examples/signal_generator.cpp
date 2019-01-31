@@ -25,18 +25,6 @@ using namespace hyro;
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-double signal_property_amplitude;
-double signal_property_frequency;
-bool signal_property_cosine;
-double digital_property_amplitude;
-double digital_property_threshold;
-
-double signal_amp;
-double freq;
-double digital_amp;
-double thrhold;
-bool sin_or_cos;
-
 void plot()
 {
   widgets::registerChannelListener<hyro::Signal>("/signal/value", "api", [](hyro::Signal sgn){
@@ -51,6 +39,15 @@ void plot()
 
 int main()
 {
+  //-------------------------------------------------
+  // LOCAL VARIABLES
+  //-------------------------------------------------
+
+  double signal_amp;
+  double freq;
+  double digital_amp;
+  double thrhold;
+  bool sin_or_cos;
 
   //-------------------------------------------------
   // MAIN FUNCTION
@@ -199,10 +196,9 @@ int main()
   // Step 12: Request parameters from user and set
   //          new dynamic properties
   //-------------------------------------------------
-
-  while (true)
+  char quit;
+  do
   {
-    std::cout << "Type 'q' to exit" << std::endl;
     std::cout << "Type the sine amplitude: ";
     std::cin >> signal_amp;
     std::cout << "Type the sine frequency: ";
@@ -220,20 +216,29 @@ int main()
     dynamic_property_access_signal.set<bool>("cosine", sin_or_cos);
     dynamic_property_access_digital.set<double>("amplitude", digital_amp);
     dynamic_property_access_digital.set<double>("threshold", thrhold);
-  }
+
+    std::cout << "Continue? [y/N]" << std::endl;
+    std::cin >> quit;
+    
+  }while (quit != 'N');
   
   //-------------------------------------------------
   // Step 13: Invokes cancellation token
   //-------------------------------------------------
   cancellation_token.cancel();
-
+  
   //-------------------------------------------------
   // Step 14: Reset all state machines and exit
   //-------------------------------------------------
 
+  t1.join();
+  signal_spinner.wait();
+  digital_spinner.wait();
+
   signal_sm.reset();
   digital_sm.reset();
   widgets::reset();
+
   return 0;
 }
 

@@ -1,23 +1,13 @@
 hyro_init_package(hyro_signal_generator VERSION 0.0.1)
 
-include ( FindPkgConfig  )
-find_package ( Qt4 COMPONENTS QtCore QtGui QtOpenGl )
-find_package ( QWT )
-
 hyro_find_package(hyro_utils REQUIRED)
 hyro_find_package(hyro_msgs REQUIRED)
 hyro_find_package(hyro_widgets REQUIRED)
-
-include(${QT_USE_FILE} )
-add_definitions(${QT_DEFINITIONS})
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
 )
 
-QT4_ADD_RESOURCES(QtApp_RCC_SRCS src/widgets/resources.qrc)
-qt4_wrap_cpp( ${PROJECT_NAME}_MOC_CPP ${hyro_widgets_HEADERS_MOC} )
-  
 set(SIGNAL_GENERATOR_HEADERS
   include/hyro/DigitalConverterComponent.h
   include/hyro/SignalGeneratorComponent.h

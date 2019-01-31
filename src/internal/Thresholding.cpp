@@ -5,27 +5,25 @@ namespace hyro
 {
 
 Thresholding::Thresholding()
+  : m_amplitude(1)
+  , m_threshold(0)
 {
-  amplitude = 1;
-  threshold = 0;
 }
 
 
-double Thresholding::get_threshold(double value)
+double Thresholding::calculateThreshold(double value)
 {
-  if (value > threshold)
-  { return amplitude; }
-
-  else
-  { return 0; }
+  if (value > m_threshold) 
+    return m_amplitude; 
+  return 0; 
 }
 
-void Thresholding::setThreshold(double th) { threshold = th; }
+void Thresholding::setThreshold(double th) { m_threshold = th; }
 
-double Thresholding::getThreshold() { return threshold; }
+double Thresholding::getThreshold() { return m_threshold; }
 
-void Thresholding::setAmplitude(double amp) { amplitude = amp; }
+void Thresholding::setAmplitude(double amp) { m_amplitude = amp; }
 
-double Thresholding::getAmplitude() { return amplitude; }
+double Thresholding::getAmplitude() { return m_amplitude; }
 
 } //namespace hyro
