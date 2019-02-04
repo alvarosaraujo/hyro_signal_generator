@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include <hyro/factory/CommandFactory.h>
 #include <hyro/DigitalConverterComponent.h> 
 
 using namespace std::chrono_literals;
@@ -10,20 +9,25 @@ namespace hyro
 
 // Where should I declare those variables to be accessible to all functions?
 
-// How to initialize parameters with config.parameters.getParameter?
-
-// Use 'check' with both testing and main code
-
-Thresholding thold;
+// Thresholding thold;
 std::shared_ptr<HyroLogger> DigitalConverterComponent::s_logger = HyroLoggerManager::CreateLogger("DigitalConverterComponent");
 
 Result
 DigitalConverterComponent::init (const ComponentConfiguration & configuration)
 {
+
+  thold = Thresholding();
   auto m_dummy = registerOutput<std::vector<int>>("fix_dynamic"_uri, configuration);
 
   m_input = this->registerInput<Signal>("value"_uri, configuration);
   m_output = this->registerOutput<double>("digital"_uri, configuration);
+  
+  double amplitude = configuration.parameters.getParameter<double>("amplitude", 4);
+  thold.setAmplitude(amplitude);
+
+  double threshold = configuration.parameters.getParameter<double>("threshold", -1);
+  thold.setThreshold(threshold);
+
 
   registerDynamicProperty<double>("amplitude", 
                                   &DigitalConverterComponent::setAmplitude,
@@ -103,8 +107,6 @@ void
 DigitalConverterComponent::callback (std::shared_ptr<const Signal> && value)
 {
   //Retrieves data from received message
-  //long int timestamp = value->timestamp;
-  //std::string frame = value->frame_id;
   double val = value->value;
 
   //Calculates digital output from received value

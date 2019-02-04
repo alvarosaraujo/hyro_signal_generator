@@ -1,23 +1,25 @@
 #include <iostream>
-#include <hyro/utils/SpinnerDefault.h>
-#include <hyro/factory/CommandFactory.h>
+
 #include <hyro/SignalGeneratorComponent.h>
-#include <hyro/SignalGenerator.h>
-#include <hyro/msgs/Signal.h>
-#include <hyro/utils/DynamicPropertyAccess.h>
 
 using namespace std::chrono_literals;
 
 namespace hyro
 {
 std::shared_ptr<HyroLogger> SignalGeneratorComponent::s_logger = HyroLoggerManager::CreateLogger("SignalGeneratorComponent");
-SignalGenerator sg;
+// SignalGenerator sg;
 
 Result
 SignalGeneratorComponent::init (const ComponentConfiguration & configuration)
 {
   std::shared_ptr<ChannelOutput<Signal>> m_signal_output;
   hyro::DynamicPropertyAccess dynamic_property_access_signal("/signal"_uri);
+
+  double frequency = configuration.parameters.getParameter<double>("frequency", 0.2);
+  sg.setFrequency(frequency);
+
+  double amplitude = configuration.parameters.getParameter<double>("amplitude", 3);
+  sg.setAmplitude(amplitude);
 
   registerDynamicProperty<double>("amplitude",
                                   &SignalGeneratorComponent::setAmplitude,
@@ -31,7 +33,7 @@ SignalGeneratorComponent::init (const ComponentConfiguration & configuration)
                                   this
                                   );
 
-  registerDynamicProperty<bool>("cosine",
+  registerDynamicProperty<int>("cosine",
                                 &SignalGeneratorComponent::setCosine,
                                 &SignalGeneratorComponent::getCosine,
                                 this
@@ -53,8 +55,7 @@ SignalGeneratorComponent::getAmplitude()
 bool 
 SignalGeneratorComponent::setAmplitude(double ampl) 
 { 
-  amplitude = ampl; 
-  sg.setAmplitude(amplitude);
+  sg.setAmplitude(ampl);
   return true;
 }
 
@@ -66,23 +67,21 @@ SignalGeneratorComponent::getFrequency()
 
 bool 
 SignalGeneratorComponent::setFrequency(double freq) 
-{ 
-  frequency = freq; 
-  sg.setFrequency(frequency);
+{  
+  sg.setFrequency(freq);
   return true;
 }
 
-bool
+int
 SignalGeneratorComponent::getCosine()
 {
-  return cosine;
+  return m_cosine;
 }
 
 bool 
-SignalGeneratorComponent::setCosine(bool coss) 
+SignalGeneratorComponent::setCosine(int coss) 
 { 
-  cosine = coss; 
-  sg.setCosine(cosine);
+  sg.setCosine(coss);
   return true;
 }
 
@@ -95,8 +94,6 @@ SignalGeneratorComponent::check ()
 Result
 SignalGeneratorComponent::start ()
 {
-  double freq = 1;
-  sg.setFrequency(freq);
   return Result::RESULT_OK;
 }
 
@@ -114,7 +111,8 @@ SignalGeneratorComponent::update ()
 
   message_signal.timestamp = t;
   message_signal.value = sg.getSignalValue();
-  message_signal.frame_id = "pimba";
+  message_signal.frame_id = "signal";
+
   m_output->sendAsync(message_signal);
   return Result::RESULT_OK;
 }

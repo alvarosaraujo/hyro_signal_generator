@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef SIGNAL_GENERATOR_H
-#define SIGNAL_GENERATOR_H
+#ifndef THRESHOLDING_H
+#define THRESHOLDING_H
 
 #include <bits/stdc++.h>
 

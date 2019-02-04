@@ -25,19 +25,8 @@ using namespace hyro;
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-void plot()
-{
-  widgets::registerChannelListener<hyro::Signal>("/signal/value", "api", [](hyro::Signal sgn){
-    widgets::plot2d<float>("Signal", "/signal/value", sgn.value);
-  });
 
-  widgets::registerChannelListener<double>("/digital/digital", "api", [](double dgt){
-    widgets::plot2d<float>("Digital", "/digital/digital", dgt);
-  });
-  widgets::exec();
-}
-
-int main()
+void input_data()
 {
   //-------------------------------------------------
   // LOCAL VARIABLES
@@ -47,8 +36,43 @@ int main()
   double freq;
   double digital_amp;
   double thrhold;
-  bool sin_or_cos;
+  int sin_or_cos;
 
+  // Access the dynamic properties from the SignalGeneratorComponent
+  hyro::DynamicPropertyAccess dynamic_property_access_signal("/signal"_uri);
+  hyro::DynamicPropertyAccess dynamic_property_access_digital("/digital"_uri);
+
+  char quit;
+  do
+  {
+    std::cout << "Type the sine amplitude: ";
+    std::cin >> signal_amp;
+    std::cout << "Type the sine frequency: ";
+    std::cin >> freq;
+    std::cout << "Type 0 for sine or 1 for cosine: ";
+    std::cin >> sin_or_cos;
+    std::cout << "Type the digital signal amplitude: ";
+    std::cin >> digital_amp;
+    std::cout << "Type the threshold: ";
+    std::cin >> thrhold;
+
+    // Set new values to dynamic properties
+    dynamic_property_access_signal.set<double>("amplitude", signal_amp);
+    dynamic_property_access_signal.set<double>("frequency", freq);
+    dynamic_property_access_signal.set<int>("cosine", sin_or_cos);
+    dynamic_property_access_digital.set<double>("amplitude", digital_amp);
+    dynamic_property_access_digital.set<double>("threshold", thrhold);
+
+    std::cout << "--- Type 'q' to stop ---" << std::endl;
+    std::cin >> quit;
+  } while (quit != 'q');
+
+  std::cout << "Close all widget windows to end program!" << std::endl;
+}
+
+int main()
+{
+  
   //-------------------------------------------------
   // MAIN FUNCTION
   //-------------------------------------------------
@@ -75,14 +99,22 @@ int main()
   // GRPC
   #if defined(TEST_GRPC)
     ComponentConfiguration signal_conf = ComponentConfiguration("{"
+      "parameters: {"
+        "amplitude: 1, frequency: 1, sine: 0"
+      "},"
       "outputs: {"
-        "value:     {protocol: 'grpc', ip: '0.0.0.0', port: '50051'},"
-        "timestamp: {protocol: 'grpc', ip: '0.0.0.0', port: '50052'},"
-        "frame_id:  {protocol: 'grpc', ip: '0.0.0.0', port: '50053'}}"
+        "value:       { protocol: 'grpc', ip: '0.0.0.0', port: '50051'},"
+        "timestamp:   { protocol: 'grpc', ip: '0.0.0.0', port: '50052'},"
+        "frame_id:    { protocol: 'grpc', ip: '0.0.0.0', port: '50053'},"
+        "fix_dynamic: { protocol: 'grpc', ip: '0.0.0.0', port: '50055'}}"
       "}");              
     ComponentConfiguration digital_conf = ComponentConfiguration("{"
+      "parameters: {"
+        "amplitude: 1, threshold: 1"
+      "},"
       "outputs: {"
-        "digital: { protocol: 'grpc', ip: '0.0.0.0', port: '50054' }"
+        "digital:     { protocol: 'grpc', ip: '0.0.0.0', port: '50056'},"
+        "fix_dynamic: { protocol: 'grpc', ip: '0.0.0.0', port: '50054'}"
       "},"
       "inputs: {"
         "value:     { protocol: 'grpc' },"
@@ -106,6 +138,9 @@ int main()
   // API
   #elif defined(TEST_API)
     ComponentConfiguration signal_conf = ComponentConfiguration("{"
+        "parameters: {"
+          "amplitude: 5, frequency: 0.3, sine: 0"
+        "},"
         "outputs: {"
           "value: { protocol: 'api' },"
           "timestamp: { protocol: 'api' },"
@@ -114,6 +149,9 @@ int main()
         "}"
       "}");
     ComponentConfiguration digital_conf = ComponentConfiguration("{"
+      "parameters: {"
+        "amplitude: 5, threshold: 0"
+      "},"
       "outputs: {"
         "digital: { protocol: 'api' },"
         "fix_dynamic: { protocol: 'api' }"
@@ -168,7 +206,6 @@ int main()
 
   // This object is a single token, shared by all the threads, used to ask them to stop running.
   CancellationTokenSource cancellation_token;
-  std::this_thread::sleep_for(1s);
 
   //-------------------------------------------------
   // Step 9: Create spinners
@@ -178,63 +215,42 @@ int main()
   StateMachineSpinner digital_spinner(digital_sm, cancellation_token, 10ms);
 
   //-------------------------------------------------
-  // Step 10: Create dynamic property access
+  // Step 9: Create thread for input request
   //-------------------------------------------------
 
-  // Access the dynamic properties from the SignalGeneratorComponent
-  hyro::DynamicPropertyAccess dynamic_property_access_signal("/signal"_uri);
-  hyro::DynamicPropertyAccess dynamic_property_access_digital("/digital"_uri);
-
-  //-------------------------------------------------
-  // Step 11: Start plot function as thread
-  //-------------------------------------------------
-
-  std::thread t1(plot);
   std::this_thread::sleep_for(2s);
-
-  //-------------------------------------------------
-  // Step 12: Request parameters from user and set
-  //          new dynamic properties
-  //-------------------------------------------------
-  char quit;
-  do
-  {
-    std::cout << "Type the sine amplitude: ";
-    std::cin >> signal_amp;
-    std::cout << "Type the sine frequency: ";
-    std::cin >> freq;
-    std::cout << "Type 0 for sine or 1 for cosine: ";
-    std::cin >> sin_or_cos;
-    std::cout << "Type the digital signal amplitude: ";
-    std::cin >> digital_amp;
-    std::cout << "Type the threshold: ";
-    std::cin >> thrhold;
-
-    // Set new values to dynamic properties
-    dynamic_property_access_signal.set<double>("amplitude", signal_amp);
-    dynamic_property_access_signal.set<double>("frequency", freq);
-    dynamic_property_access_signal.set<bool>("cosine", sin_or_cos);
-    dynamic_property_access_digital.set<double>("amplitude", digital_amp);
-    dynamic_property_access_digital.set<double>("threshold", thrhold);
-
-    std::cout << "Continue? [y/N]" << std::endl;
-    std::cin >> quit;
-    
-  }while (quit != 'N');
+  std::thread thread_input(input_data);
   
   //-------------------------------------------------
-  // Step 13: Invokes cancellation token
+  // Step 10: Start plot
   //-------------------------------------------------
+
+  widgets::registerChannelListener<hyro::Signal>("/signal/value", "api", [](hyro::Signal sgn){
+    widgets::plot2d<float>("Signal", "/signal/value", sgn.value);
+  });
+
+  widgets::registerChannelListener<double>("/digital/digital", "api", [](double dgt){
+    widgets::plot2d<float>("Digital", "/digital/digital", dgt);
+  });
+  widgets::exec();
+  
+  std::this_thread::sleep_for(1s);
+
+  //-------------------------------------------------
+  // Step 11: Invokes cancellation token
+  //-------------------------------------------------
+
   cancellation_token.cancel();
   
   //-------------------------------------------------
-  // Step 14: Reset all state machines and exit
+  // Step 12: Reset all state machines and exit
   //-------------------------------------------------
 
-  t1.join();
+
+  
   signal_spinner.wait();
   digital_spinner.wait();
-
+  thread_input.join();
   signal_sm.reset();
   digital_sm.reset();
   widgets::reset();

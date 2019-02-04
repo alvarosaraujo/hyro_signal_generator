@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef HYRO_CORE_SIGNALGENERATORCOMPONENT_H
-#define HYRO_CORE_SIGNALGENERATORCOMPONENT_H
+#ifndef HYRO_SIGNALGENERATORCOMPONENT_H
+#define HYRO_SIGNALGENERATORCOMPONENT_H
 
 #include <hyro_signal_generator_components_export.h>  
 
@@ -9,11 +9,16 @@
 #include <hyro/msgs/Signal.h>
 #include <hyro/core/Component.h>
 #include <hyro/msgs/common/Basic.h>
+#include <hyro/SignalGenerator.h>
+#include <hyro/msgs/Signal.h>
+#include <hyro/utils/DynamicPropertyAccess.h>
+#include <hyro/utils/SpinnerDefault.h>
+#include <hyro/factory/CommandFactory.h>
 
 namespace hyro
 {
 
-class HYRO_SIGNAL_GENERATOR_COMPONENTS_EXPORT SignalGeneratorComponent : public Component
+class HYRO_SIGNAL_GENERATOR_COMPONENTS_EXPORT SignalGeneratorComponent : public hyro::Component
 {
 public:
 
@@ -52,19 +57,16 @@ public:
   getFrequency();
 
   bool 
-  setCosine(bool cosine);
+  setCosine(int cosine);
   
-  bool 
+  int 
   getCosine();
 
 private:
 
-  double m_amplitude;
-  double m_frequency;
-  bool m_cosine;
-  
-  double amplitude, frequency;
-  bool cosine;
+  double m_amplitude, m_frequency;
+  int m_cosine;
+  SignalGenerator sg;
 
   static std::shared_ptr<HyroLogger> s_logger;
 
@@ -74,4 +76,4 @@ private:
 
 } // namespace hyro
 
-#endif // HYRO_CORE_SIGNALGENERATORCOMPONENT_H
+#endif // HYRO_SIGNALGENERATORCOMPONENT_H

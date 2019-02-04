@@ -5,11 +5,8 @@ namespace hyro
 {
 
 Thresholding::Thresholding()
-  : m_amplitude(1)
-  , m_threshold(0)
 {
 }
-
 
 double Thresholding::calculateThreshold(double value)
 {

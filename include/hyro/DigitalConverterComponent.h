@@ -10,10 +10,12 @@
 #include <hyro/core/Component.h>
 #include <hyro/utils/ISpinner.h>
 #include <hyro/Thresholding.h>
+#include <hyro/SignalGenerator.h>
 #include <hyro/msgs/Signal.h>
 #include <hyro/utils/SpinnerDefault.h>
 #include <hyro/utils/SpinnerRated.h>
 #include <hyro/msgs/common/Basic.h>
+#include <hyro/factory/CommandFactory.h>
 
 namespace hyro
 {
@@ -68,6 +70,9 @@ private:
   std::shared_ptr<hyro::ChannelInput<Signal>> m_input;
   std::shared_ptr<hyro::ChannelOutput<double>> m_output;
   std::unique_ptr<ISpinner> m_spinner;
+
+  Thresholding thold;
+  
 };
 
 } // namespace hyro

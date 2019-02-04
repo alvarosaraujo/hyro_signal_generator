@@ -13,17 +13,16 @@ class SignalGenerator
   private:
 
     double m_rad, m_deg, m_step, m_amp;
-    bool m_cosine;
+    int m_cosine;
     enum function 
     {
-      cosine = 0,
-      sine = 1
+      cosine,
+      sine
     };
     
   public:
 
     SignalGenerator();
-    SignalGenerator(double amp, double frequency);
 
     double 
     getSignalValue();
@@ -53,12 +52,12 @@ class SignalGenerator
     }
 
     void 
-    setCosine(bool coss) 
+    setCosine(int coss) 
     { 
       m_cosine = coss; 
     }
 
-    bool 
+    int 
     getCosine() 
     { 
       return m_cosine; 
