@@ -66,7 +66,7 @@ private:
 
   double m_amplitude, m_frequency;
   int m_cosine;
-  SignalGenerator sg;
+  SignalGenerator m_signal_gen;
 
   static std::shared_ptr<HyroLogger> s_logger;
 

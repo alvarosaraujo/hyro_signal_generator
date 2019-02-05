@@ -133,7 +133,7 @@ TEST (ExampleTest, SignalGeneratorComponentCheck)
   ReceiveStatus rec_signal = inputSignal->receive(valueSignal, 500ms);
 
   ASSERT_EQ(ReceiveStatus::RECEIVE_OK, rec_signal);
-  EXPECT_EQ(valueSignal->value, 3);
+  EXPECT_EQ(valueSignal->value, 0);
 
   signal_generator_sm.reset();
 }

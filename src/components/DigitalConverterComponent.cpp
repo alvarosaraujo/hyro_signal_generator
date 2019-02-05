@@ -6,28 +6,23 @@ using namespace std::chrono_literals;
 
 namespace hyro
 {
-
-// Where should I declare those variables to be accessible to all functions?
-
-// Thresholding thold;
 std::shared_ptr<HyroLogger> DigitalConverterComponent::s_logger = HyroLoggerManager::CreateLogger("DigitalConverterComponent");
 
 Result
 DigitalConverterComponent::init (const ComponentConfiguration & configuration)
 {
 
-  thold = Thresholding();
+  m_thresholding = Thresholding();
   auto m_dummy = registerOutput<std::vector<int>>("fix_dynamic"_uri, configuration);
 
   m_input = this->registerInput<Signal>("value"_uri, configuration);
   m_output = this->registerOutput<double>("digital"_uri, configuration);
   
   double amplitude = configuration.parameters.getParameter<double>("amplitude", 4);
-  thold.setAmplitude(amplitude);
+  m_thresholding.setAmplitude(amplitude);
 
   double threshold = configuration.parameters.getParameter<double>("threshold", -1);
-  thold.setThreshold(threshold);
-
+  m_thresholding.setThreshold(threshold);
 
   registerDynamicProperty<double>("amplitude", 
                                   &DigitalConverterComponent::setAmplitude,
@@ -49,7 +44,7 @@ DigitalConverterComponent::init (const ComponentConfiguration & configuration)
 bool 
 DigitalConverterComponent::setThreshold(double th) 
 { 
-  thold.setThreshold(th);
+  m_thresholding.setThreshold(th);
   return true;
 }
 
@@ -57,14 +52,14 @@ DigitalConverterComponent::setThreshold(double th)
 double 
 DigitalConverterComponent::getThreshold() 
 { 
-  return thold.getThreshold();
+  return m_thresholding.getThreshold();
 }
 
 // Set amplitude dynamic property
 bool 
 DigitalConverterComponent::setAmplitude(double amp) 
 {
-  thold.setAmplitude(amp);
+  m_thresholding.setAmplitude(amp);
   return true; 
 }
 
@@ -72,7 +67,7 @@ DigitalConverterComponent::setAmplitude(double amp)
 double 
 DigitalConverterComponent::getAmplitude() 
 { 
-  return thold.getAmplitude();
+  return m_thresholding.getAmplitude();
 }
 
 Result
@@ -110,7 +105,7 @@ DigitalConverterComponent::callback (std::shared_ptr<const Signal> && value)
   double val = value->value;
 
   //Calculates digital output from received value
-  double res = thold.calculateThreshold(val);
+  double res = m_thresholding.calculateThreshold(val);
 
   //Send result
   m_output->sendAsync(res);

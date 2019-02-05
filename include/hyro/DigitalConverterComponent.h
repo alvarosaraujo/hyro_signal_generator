@@ -71,7 +71,7 @@ private:
   std::shared_ptr<hyro::ChannelOutput<double>> m_output;
   std::unique_ptr<ISpinner> m_spinner;
 
-  Thresholding thold;
+  Thresholding m_thresholding;
   
 };
 

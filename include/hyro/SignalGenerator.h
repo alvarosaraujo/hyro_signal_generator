@@ -12,7 +12,7 @@ class SignalGenerator
 {
   private:
 
-    double m_rad, m_deg, m_step, m_amp;
+    double m_deg, m_step, m_amp;
     int m_cosine;
     enum function 
     {

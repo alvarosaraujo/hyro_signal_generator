@@ -7,7 +7,6 @@ using namespace std::chrono_literals;
 namespace hyro
 {
 std::shared_ptr<HyroLogger> SignalGeneratorComponent::s_logger = HyroLoggerManager::CreateLogger("SignalGeneratorComponent");
-// SignalGenerator sg;
 
 Result
 SignalGeneratorComponent::init (const ComponentConfiguration & configuration)
@@ -16,10 +15,10 @@ SignalGeneratorComponent::init (const ComponentConfiguration & configuration)
   hyro::DynamicPropertyAccess dynamic_property_access_signal("/signal"_uri);
 
   double frequency = configuration.parameters.getParameter<double>("frequency", 0.2);
-  sg.setFrequency(frequency);
+  m_signal_gen.setFrequency(frequency);
 
   double amplitude = configuration.parameters.getParameter<double>("amplitude", 3);
-  sg.setAmplitude(amplitude);
+  m_signal_gen.setAmplitude(amplitude);
 
   registerDynamicProperty<double>("amplitude",
                                   &SignalGeneratorComponent::setAmplitude,
@@ -49,26 +48,26 @@ SignalGeneratorComponent::init (const ComponentConfiguration & configuration)
 double
 SignalGeneratorComponent::getAmplitude()
 {
-  return sg.getAmplitude();
+  return m_signal_gen.getAmplitude();
 }
 
 bool 
 SignalGeneratorComponent::setAmplitude(double ampl) 
 { 
-  sg.setAmplitude(ampl);
+  m_signal_gen.setAmplitude(ampl);
   return true;
 }
 
 double
 SignalGeneratorComponent::getFrequency()
 {
-  return sg.getFrequency();
+  return m_signal_gen.getFrequency();
 }
 
 bool 
 SignalGeneratorComponent::setFrequency(double freq) 
 {  
-  sg.setFrequency(freq);
+  m_signal_gen.setFrequency(freq);
   return true;
 }
 
@@ -81,7 +80,7 @@ SignalGeneratorComponent::getCosine()
 bool 
 SignalGeneratorComponent::setCosine(int coss) 
 { 
-  sg.setCosine(coss);
+  m_signal_gen.setCosine(coss);
   return true;
 }
 
@@ -110,7 +109,7 @@ SignalGeneratorComponent::update ()
   time_t t = std::time(0);
 
   message_signal.timestamp = t;
-  message_signal.value = sg.getSignalValue();
+  message_signal.value = m_signal_gen.getSignalValue();
   message_signal.frame_id = "signal";
 
   m_output->sendAsync(message_signal);

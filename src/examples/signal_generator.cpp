@@ -5,26 +5,23 @@
 #include <bits/stdc++.h>
 #include <thread>
 
-#include <hyro/SignalGenerator.h>
 #include <hyro/SignalGeneratorComponent.h>
-#include <hyro/Thresholding.h>
 #include <hyro/DigitalConverterComponent.h>
 
 // We will work with state machines that wraps the components
 #include <hyro/core/StateMachine.h>
-#include <hyro/utils/components/PrintComponent.h>
 
 // A utility that will manage multi-threaded updates for us (less code to write)
 #include <hyro/utils/StateMachineSpinner.h>
-#include <hyro/utils/components/NumberGeneratorComponent.h>
+
 #include <hyro/utils/DynamicPropertyAccess.h>
 #include <hyro/msgs/common/Basic.h>
 #include <hyro/widgets/WidgetCollection.h>
+#include <hyro/utils/components/PrintComponent.h>
 
 using namespace hyro;
 using namespace std::string_literals;
 using namespace std::chrono_literals;
-
 
 void input_data()
 {
@@ -246,8 +243,6 @@ int main()
   // Step 12: Reset all state machines and exit
   //-------------------------------------------------
 
-
-  
   signal_spinner.wait();
   digital_spinner.wait();
   thread_input.join();

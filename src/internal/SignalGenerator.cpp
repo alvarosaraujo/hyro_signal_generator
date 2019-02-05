@@ -13,13 +13,13 @@ SignalGenerator::SignalGenerator()
 
 double SignalGenerator::getSignalValue()
 {
-  m_rad = m_deg / 180.0 * M_PI;
+  double rad = m_deg / 180.0 * M_PI;
   m_deg += m_step;
   
   if (m_cosine == function::cosine) 
-    return m_amp * cos(m_rad);
+    return m_amp * cos(rad);
 
-  return  m_amp * sin(m_rad);
+  return  m_amp * sin(rad);
 }
 
 }
