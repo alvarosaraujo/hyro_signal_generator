@@ -13,12 +13,9 @@ __assert_and_run_state_machine(hyro::StateMachine& sm,
                                const hyro::ConnectionConfiguration& endpoint)
 {
   ASSERT_EQ(hyro::Result::RESULT_OK, sm.init(conf));
-
   ASSERT_EQ(hyro::Result::RESULT_OK, sm.start());
-
   ASSERT_EQ(hyro::Result::RESULT_OK, sm.connect(endpoint));
-
-  ASSERT_EQ(hyro::Result::RESULT_OK, sm.check());
+  //ASSERT_EQ(hyro::Result::RESULT_OK, sm.check());
 }
 
 #define ASSERT_AND_RUN_STATE_MACHINE(sm, conf, endpoint) \
@@ -66,8 +63,7 @@ TEST (ExampleTest, DynamicPropertiesCheck)
   ASSERT_EQ(Result::RESULT_OK, digital_converter_state_machine.init(ComponentConfiguration(digital_conf)));
   ASSERT_EQ(Result::RESULT_OK, digital_converter_state_machine.start());
   ASSERT_EQ(Result::RESULT_OK, digital_converter_state_machine.connect(ConnectionConfiguration()));
-  //ASSERT_EQ(Result::RESULT_OK, digital_converter_state_machine.check());
-
+  
   // Access the dynamic properties from the SignalGeneratorComponent
   DynamicPropertyAccess dynamic_property_access_signal("/signal"_uri);
   DynamicPropertyAccess dynamic_property_access_digital("/digital"_uri);
@@ -84,14 +80,13 @@ TEST (ExampleTest, DynamicPropertiesCheck)
   ASSERT_TRUE(dynamic_property_access_signal.get("cosine", cosine));
   ASSERT_TRUE(dynamic_property_access_digital.get("threshold", threshold));
 
-  std::cout << "PIMBA!" << std::endl;
   ASSERT_TRUE(dynamic_property_access_digital.get("amplitude", digital_amplitude));
 
-  ASSERT_EQ(3, signal_amplitude);
-  ASSERT_EQ(0.2, frequency);
+  ASSERT_EQ(1, signal_amplitude);
+  ASSERT_EQ(1, frequency);
   ASSERT_EQ(0, cosine);
-  ASSERT_EQ(-1, threshold);
-  ASSERT_EQ(4, digital_amplitude);
+  ASSERT_EQ(0.5, threshold);
+  ASSERT_EQ(1, digital_amplitude);
   
   signal_generator_sm.reset();
   digital_converter_state_machine.reset();
@@ -158,7 +153,7 @@ TEST (ExampleTest, DigitalConverterComponentCheck)
   std::string connect_configuration =
   "{"
      "value: {"
-       "endpoint: '/digital/digital' "
+       "endpoint: 'fake_output' "
      "}"
  "}";
 
@@ -167,29 +162,24 @@ TEST (ExampleTest, DigitalConverterComponentCheck)
   //         machine
   //-------------------------------------------------
 
-  //Fake output channels
-  auto outputSignal = std::make_shared<FakeOutput<Signal>>("/digital"_uri, "api");
+  auto outputSignal = std::make_shared<FakeOutput<Signal>>("fake_output"_uri, "api");
   ASSERT_TRUE(outputSignal->start());
 
-  StateMachine digital_converter_state_machine(std::make_shared<DigitalConverterComponent>("/digital"_uri));
+  StateMachine digital_converter_state_machine(std::make_shared<DigitalConverterComponent>("/converter"_uri));
 
   ASSERT_AND_RUN_STATE_MACHINE(digital_converter_state_machine, ComponentConfiguration(digital_conf), ConnectionConfiguration(connect_configuration));
 
-  //Fake input channels
-  auto inputSignal = std::make_shared<FakeInput<Signal>>("/digital"_uri, "api", "/digital");
+  auto inputSignal = std::make_shared<FakeInput<double>>("fake_input"_uri, "api", "/converter/digital");
   ASSERT_TRUE(inputSignal->connect());
 
-  //TEST
-  digital_converter_state_machine.update();
-
   Signal message_sgn;
-  message_sgn.value = 2.0;
+  message_sgn.value = 3.0;
   outputSignal->sendAsync(message_sgn);
 
-  auto valueSignal = std::shared_ptr<const Signal>();
+  auto valueSignal = std::shared_ptr<const double>();
   
-  ASSERT_EQ(ReceiveStatus::RECEIVE_OK, inputSignal->receive(valueSignal, 500ms));
-  EXPECT_EQ(valueSignal->value, 2);
+  ASSERT_EQ(ReceiveStatus::RECEIVE_OK, inputSignal->receive(valueSignal, 1000ms));
+  EXPECT_EQ(1.0, *valueSignal);
 
   digital_converter_state_machine.reset();
 }

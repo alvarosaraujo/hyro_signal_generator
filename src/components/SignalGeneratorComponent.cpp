@@ -14,10 +14,10 @@ SignalGeneratorComponent::init (const ComponentConfiguration & configuration)
   std::shared_ptr<ChannelOutput<Signal>> m_signal_output;
   hyro::DynamicPropertyAccess dynamic_property_access_signal("/signal"_uri);
 
-  double frequency = configuration.parameters.getParameter<double>("frequency", 0.2);
+  double frequency = configuration.parameters.getParameter<double>("frequency", 1.0);
   m_signal_gen.setFrequency(frequency);
 
-  double amplitude = configuration.parameters.getParameter<double>("amplitude", 3);
+  double amplitude = configuration.parameters.getParameter<double>("amplitude", 1.0);
   m_signal_gen.setAmplitude(amplitude);
 
   registerDynamicProperty<double>("amplitude",
@@ -106,9 +106,11 @@ Result
 SignalGeneratorComponent::update ()
 {
   hyro::Signal message_signal;
-  time_t t = std::time(0);
+  
+  //time_t t = std::time(0);
+  //message_signal.timestamp = t;
 
-  message_signal.timestamp = t;
+  message_signal.timestamp = TimeUtils::Now_TimeSinceEpoch();
   message_signal.value = m_signal_gen.getSignalValue();
   message_signal.frame_id = "signal";
 

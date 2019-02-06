@@ -18,7 +18,7 @@ struct ProtobufTraits<Signal> : public ProtobufTraitsDefault<Signal, msgs::Signa
   static void
   FromMessage (const msgs::Signal & msg, Signal * value)
   {
-    value->timestamp = msg.timestamp();
+    value->timestamp = hyro::Time{msg.timestamp()};
     value->value = msg.value();
     value->frame_id = msg.frame_id();
   }
@@ -26,7 +26,7 @@ struct ProtobufTraits<Signal> : public ProtobufTraitsDefault<Signal, msgs::Signa
   static void
   ToMessage (const Signal & value_in, msgs::Signal * msg)
   {
-    msg->set_timestamp(value_in.timestamp);
+    msg->set_timestamp(value_in.timestamp.count());
     msg->set_frame_id(value_in.frame_id);
     msg->set_value(value_in.value);
   }

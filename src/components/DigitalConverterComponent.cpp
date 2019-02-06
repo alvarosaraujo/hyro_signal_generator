@@ -12,16 +12,15 @@ Result
 DigitalConverterComponent::init (const ComponentConfiguration & configuration)
 {
 
-  m_thresholding = Thresholding();
   auto m_dummy = registerOutput<std::vector<int>>("fix_dynamic"_uri, configuration);
 
   m_input = this->registerInput<Signal>("value"_uri, configuration);
   m_output = this->registerOutput<double>("digital"_uri, configuration);
   
-  double amplitude = configuration.parameters.getParameter<double>("amplitude", 4);
+  double amplitude = configuration.parameters.getParameter<double>("amplitude", 1.0);
   m_thresholding.setAmplitude(amplitude);
 
-  double threshold = configuration.parameters.getParameter<double>("threshold", -1);
+  double threshold = configuration.parameters.getParameter<double>("threshold", 0.5);
   m_thresholding.setThreshold(threshold);
 
   registerDynamicProperty<double>("amplitude", 

@@ -28,40 +28,22 @@ class SignalGenerator
     getSignalValue();
 
     void 
-    setAmplitude(double amplitude) 
-    { 
-      m_amp = amplitude; 
-    }
+    setAmplitude(double amplitude) { m_amp = amplitude; }
 
     double 
-    getAmplitude() 
-    {
-      return m_amp; 
-    }
+    getAmplitude() { return m_amp; }
 
     void 
-    setFrequency(double frequency) 
-    { 
-      m_step = ( 360.0 * frequency * 10.0 ) / 1000.0 ; 
-    }
+    setFrequency(double frequency) { m_step = ( 360.0 * frequency * 10.0 ) / 1000.0 ; }
 
     double 
-    getFrequency() 
-    { 
-      return 1000.0 * m_step / ( 360.0 * 10.0 ); 
-    }
+    getFrequency() { return 1000.0 * m_step / ( 360.0 * 10.0 ); }
 
     void 
-    setCosine(int coss) 
-    { 
-      m_cosine = coss; 
-    }
+    setCosine(int coss) { m_cosine = coss; }
 
     int 
-    getCosine() 
-    { 
-      return m_cosine; 
-    }
+    getCosine() { return m_cosine; }
 };
 
 }

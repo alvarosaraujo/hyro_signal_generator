@@ -4,6 +4,7 @@
 #define SIGNAL_GENERATOR_MSG_SIGNAL_H
 
 #include <hyro_signal_generator_components_export.h>
+#include <hyro/common/Time.h>
 //pimba
 
 namespace hyro
@@ -11,7 +12,7 @@ namespace hyro
 
 struct HYRO_SIGNAL_GENERATOR_COMPONENTS_EXPORT Signal
 {
-  long int timestamp;
+  Time timestamp;
   std::string frame_id;
   double value;
 };
