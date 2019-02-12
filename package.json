@@ -1,0 +1,14 @@
+{
+	"name": "signal_generator",
+	"version": "0.0.1",
+
+	"author": "Alvaro Souza",
+	"description": "Signal generator and processor",
+
+	"dependencies": {
+		"hyro_api_channel": "*",
+		"hyro_utils": "*",
+		"hyro_msgs": "*",
+		"hyro_widgets": "*"
+	}
+}
